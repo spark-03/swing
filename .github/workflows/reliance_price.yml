@@ -1,29 +1,26 @@
 name: Reliance Price Updater
 
 on:
+  workflow_dispatch:
+
   schedule:
     - cron: "*/5 * * * *"
-
-  workflow_dispatch:
 
 jobs:
   update_price:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install Dependencies
-        run: |
-          pip install -r dashboard/backend/requirements.txt
+        run: pip install -r dashboard/backend/requirements.txt
 
-      - name: Run Price Fetcher
+      - name: Run Script
         env:
           SMART_API_KEY: ${{ secrets.SMART_API_KEY }}
           SMART_CLIENT_ID: ${{ secrets.SMART_CLIENT_ID }}
@@ -35,5 +32,6 @@ jobs:
 
           RELIANCE_TOKEN: ${{ secrets.RELIANCE_TOKEN }}
 
+        run: python dashboard/backend/fetch_price.py
         run: |
           python dashboard/backend/fetch_price.py
