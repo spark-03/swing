@@ -1,6 +1,5 @@
 smartapi-python
+logzero
 supabase
 pyotp
 requests
-SmartApi
-logzero
