@@ -1,20 +1,22 @@
 import os
 import pyotp
-
 from SmartApi import SmartConnect
 from supabase import create_client
 
+# Angel One Credentials
 API_KEY = os.environ["SMART_API_KEY"]
 CLIENT_ID = os.environ["SMART_CLIENT_ID"]
 PASSWORD = os.environ["SMART_PASSWORD"]
 TOTP_SECRET = os.environ["SMART_TOTP_SECRET"]
 
+# Supabase
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 
+# Reliance
 RELIANCE_TOKEN = os.environ["RELIANCE_TOKEN"]
 
-# Angel One Login
+# Login
 smart = SmartConnect(api_key=API_KEY)
 
 session = smart.generateSession(
@@ -23,14 +25,14 @@ session = smart.generateSession(
     pyotp.TOTP(TOTP_SECRET).now()
 )
 
-# Fetch LTP
-ltp_data = smart.ltpData(
+# Get LTP
+response = smart.ltpData(
     "NSE",
     "RELIANCE-EQ",
     RELIANCE_TOKEN
 )
 
-price = ltp_data["data"]["ltp"]
+price = response["data"]["ltp"]
 
 print(f"Reliance Price: {price}")
 
@@ -40,11 +42,9 @@ supabase = create_client(
     SUPABASE_KEY
 )
 
-response = supabase.table("stock_prices").insert(
-    {
-        "symbol": "RELIANCE",
-        "price": price
-    }
-).execute()
+supabase.table("stock_prices").insert({
+    "symbol": "RELIANCE",
+    "price": price
+}).execute()
 
 print("Saved to Supabase")
