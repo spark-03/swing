@@ -11,27 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install Dependencies
-        run: pip install -r dashboard/backend/requirements.txt
+        run: |
+          pip install -r dashboard/backend/requirements.txt
 
-      - name: Run Script
+      - name: Run Price Fetcher
         env:
           SMART_API_KEY: ${{ secrets.SMART_API_KEY }}
           SMART_CLIENT_ID: ${{ secrets.SMART_CLIENT_ID }}
           SMART_PASSWORD: ${{ secrets.SMART_PASSWORD }}
           SMART_TOTP_SECRET: ${{ secrets.SMART_TOTP_SECRET }}
-
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-
           RELIANCE_TOKEN: ${{ secrets.RELIANCE_TOKEN }}
-
-        run: python dashboard/backend/fetch_price.py
         run: |
           python dashboard/backend/fetch_price.py
