@@ -1,21 +1,18 @@
+import os
+import pyotp
 
 from SmartApi import SmartConnect
 from supabase import create_client
-from dotenv import load_dotenv
-import pyotp
-import os
 
-load_dotenv()
+API_KEY = os.environ["SMART_API_KEY"]
+CLIENT_ID = os.environ["SMART_CLIENT_ID"]
+PASSWORD = os.environ["SMART_PASSWORD"]
+TOTP_SECRET = os.environ["SMART_TOTP_SECRET"]
 
-API_KEY = os.getenv("SMART_API_KEY")
-CLIENT_ID = os.getenv("SMART_CLIENT_ID")
-PASSWORD = os.getenv("SMART_PASSWORD")
-TOTP_SECRET = os.getenv("SMART_TOTP_SECRET")
+SUPABASE_URL = os.environ["SUPABASE_URL"]
+SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-RELIANCE_TOKEN = os.getenv("RELIANCE_TOKEN")
+RELIANCE_TOKEN = os.environ["RELIANCE_TOKEN"]
 
 # Angel One Login
 smart = SmartConnect(api_key=API_KEY)
@@ -26,26 +23,28 @@ session = smart.generateSession(
     pyotp.TOTP(TOTP_SECRET).now()
 )
 
-# Fetch Reliance LTP
-ltp = smart.ltpData(
-    exchange="NSE",
-    tradingsymbol="RELIANCE-EQ",
-    symboltoken=RELIANCE_TOKEN
+# Fetch LTP
+ltp_data = smart.ltpData(
+    "NSE",
+    "RELIANCE-EQ",
+    RELIANCE_TOKEN
 )
 
-price = ltp["data"]["ltp"]
+price = ltp_data["data"]["ltp"]
 
-print("Reliance Price:", price)
+print(f"Reliance Price: {price}")
 
-# Supabase Connection
+# Save to Supabase
 supabase = create_client(
     SUPABASE_URL,
     SUPABASE_KEY
 )
 
-supabase.table("stock_prices").insert({
-    "symbol": "RELIANCE",
-    "price": price
-}).execute()
+response = supabase.table("stock_prices").insert(
+    {
+        "symbol": "RELIANCE",
+        "price": price
+    }
+).execute()
 
 print("Saved to Supabase")
