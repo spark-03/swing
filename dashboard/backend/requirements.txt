@@ -3,3 +3,5 @@ logzero
 supabase
 pyotp
 requests
+websocket-client
+
