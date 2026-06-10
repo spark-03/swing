@@ -1,1 +1,6 @@
 
+smartapi-python
+supabase
+python-dotenv
+pyotp
+requests
